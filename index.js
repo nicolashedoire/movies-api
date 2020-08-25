@@ -14,5 +14,5 @@ app.get('/', function (req, res) {
 });
 
 app.listen(4200, () => {
-  console.log('API Movies listen on port 5000');
+  console.log('API Movies listen on port 4200');
 })
