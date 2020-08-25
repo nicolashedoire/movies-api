@@ -13,6 +13,6 @@ app.get('/', function (req, res) {
   res.send('Welcome in Movies API');
 });
 
-app.listen(5000, () => {
+app.listen(4200, () => {
   console.log('API Movies listen on port 5000');
 })
