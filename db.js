@@ -3,22 +3,24 @@ const { Pool } = require('pg');
 
 dotenv.config();
 
-console.log(process.env);
+let pool = null;
 
-// const dbDevConfig = {
-//   host: process.env.DB_HOST,
-//   port: process.env.DB_PORT,
-//   database: process.env.DB_NAME,
-//   user: process.env.DB_USER,
-//   password: process.env.DB_PASSWORD,
-// };
-
-const dbProdConfig = {
-  connectionString: process.env.DATABASE_URL,
-  ssl: true
+if(process.env.NODE_ENV === 'PRODUCTION'){
+  const dbProdConfig = {
+    connectionString: process.env.DATABASE_URL,
+    ssl: true
+  }
+  pool = new Pool(dbProdConfig);
+}else{
+  const dbDevConfig = {
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    database: process.env.DB_NAME,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+  };
+  pool = new Pool(dbDevConfig);
 }
-
-const pool = new Pool(dbProdConfig);
 
 pool.connect((err, client) => {
     if (err) {
