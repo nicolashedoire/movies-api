@@ -2,6 +2,7 @@ const express = require("express");
 const pretty = require('express-prettify');
 const cors = require('cors');
 const helmet = require("helmet");
+require('./db');
 
 const app = express();
 
