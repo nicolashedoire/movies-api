@@ -1,0 +1,19 @@
+{
+  "pg": {
+    "driver": "pg"
+  },
+  "dev": {
+    "user": "postgres",
+    "password" : "postgres",
+    "host": "localhost",
+    "database": "movies",
+    "driver": "pg"
+  },
+  "prod": {
+    "user": {"ENV": "DB_PRODUCTION_USERNAME"},
+    "password" : {"ENV": "DB_PRODUCTION_PASSWORD"},
+    "host": {"ENV": "DB_PRODUCTION_HOST"},
+    "database": {"ENV": "DB_PRODUCTION_DATABASE"},
+    "driver": "pg"
+  }
+}

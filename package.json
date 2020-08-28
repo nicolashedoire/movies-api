@@ -5,7 +5,13 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "node index.js",
+    "migration": "./node_modules/.bin/db-migrate create ",
+    "up": "./node_modules/.bin/db-migrate up -c 1",
+    "up-all": "./node_modules/.bin/db-migrate up",
+    "down": "./node_modules/.bin/db-migrate down",
+    "down-all": "./node_modules/.bin/db-migrate reset",
+    "remigrate": "npm run down-all && npm run up"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +26,8 @@
     "express-prettify": "^0.1.1",
     "helmet": "^3.22.0",
     "json-beautify": "^1.1.1",
-    "pg": "^8.0.3"
+    "pg": "^8.0.3",
+    "db-migrate": "^0.11.6",
+    "db-migrate-pg": "^0.5.1"
   }
 }
