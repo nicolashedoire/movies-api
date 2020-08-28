@@ -10,8 +10,7 @@
     "up": "./node_modules/.bin/db-migrate up -c 1",
     "up-all": "./node_modules/.bin/db-migrate up",
     "down": "./node_modules/.bin/db-migrate down",
-    "down-all": "./node_modules/.bin/db-migrate reset",
-    "remigrate": "npm run down-all && npm run up"
+    "down-all": "./node_modules/.bin/db-migrate reset"
   },
   "keywords": [],
   "author": "",
