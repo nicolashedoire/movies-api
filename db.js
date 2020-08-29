@@ -5,21 +5,19 @@ dotenv.config();
 
 let pool = null;
 
-if(process.env.PORT){
-  console.log('Je suis en PROD');
+if(process.env.NODE_ENV === 'PRODUCTION'){
   const dbProdConfig = {
     connectionString: process.env.DATABASE_URL,
     ssl: true
   }
   pool = new Pool(dbProdConfig);
 }else{
-  console.log('Je suis en DEV');
   const dbDevConfig = {
-    host: process.env.DB_DEV_HOST,
-    port: process.env.DB_DEV_PORT,
-    database: process.env.DB_DEV_DATABASE,
-    user: process.env.DB_DEV_USERNAME,
-    password: process.env.DB_DEV_PASSWORD,
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    database: process.env.DB_NAME,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
   };
   pool = new Pool(dbDevConfig);
 }
@@ -31,8 +29,14 @@ pool.connect((err, client) => {
     console.log(`connection à la base de données ok...`);
 });
 
-const execQuery = async (query) => {
-  return pool.query(query);
+const execQuery = async (query, values) => {
+  try{
+    const res = await pool.query(query, values);
+    return res.rows[0];
+  } catch(err) {
+    console.log(err.stack)
+    return 'error';
+  }
 }
 
 module.exports = {
