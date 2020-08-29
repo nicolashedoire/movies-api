@@ -10,10 +10,10 @@ app.use(helmet());
 app.use(pretty({ query: 'pretty' }));
 app.use(cors());
 
-app.get('/', function (req, res) {
+app.get('/', async function (req, res) {
   const query = `SELECT * from movies LIMIT 100`;
   const response = await execQuery(query);
-  res.send(response);
+  res.send(response.rows);
 });
 
 app.listen(process.env.PORT || 5000, () => {
