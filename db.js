@@ -5,7 +5,7 @@ dotenv.config();
 
 let pool = null;
 
-if(process.env.NODE_ENV === 'PRODUCTION'){
+if(process.env.PORT){
   console.log('Je suis en PROD');
   const dbProdConfig = {
     connectionString: process.env.DATABASE_URL,
