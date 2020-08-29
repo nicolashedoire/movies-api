@@ -10,7 +10,11 @@
     "up": "./node_modules/.bin/db-migrate up -c 1",
     "up-all": "./node_modules/.bin/db-migrate up",
     "down": "./node_modules/.bin/db-migrate down",
-    "down-all": "./node_modules/.bin/db-migrate reset"
+    "down-all": "./node_modules/.bin/db-migrate reset",
+    "remigrate": "npm run down-all && npm run up",
+    "reset:db:prod": "heroku pg:reset DATABASE --confirm desolate-journey-34342",
+    "run:migrations:prod": "heroku run npm run up -e prod",
+    "heroku:bash": "heroku run bash"
   },
   "keywords": [],
   "author": "",

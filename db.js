@@ -29,14 +29,8 @@ pool.connect((err, client) => {
     console.log(`connection à la base de données ok...`);
 });
 
-const execQuery = async (query, values) => {
-  try{
-    const res = await pool.query(query, values);
-    return res.rows[0];
-  } catch(err) {
-    console.log(err.stack)
-    return 'error';
-  }
+const execQuery = async (query) => {
+  return pool.query(query);
 }
 
 module.exports = {
