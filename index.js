@@ -17,5 +17,5 @@ app.get('/', async function (req, res) {
 });
 
 app.listen(process.env.PORT || 5000, () => {
-  console.log(`API Movies listen on port ${process.env.PORT} || 5000`);
+  console.log(`API Movies listen on port ${process.env.PORT ? process.env.PORT : '5000'}`);
 })

@@ -6,12 +6,14 @@ dotenv.config();
 let pool = null;
 
 if(process.env.NODE_ENV === 'PRODUCTION'){
+  console.log('Je suis en PROD');
   const dbProdConfig = {
     connectionString: process.env.DATABASE_URL,
     ssl: true
   }
   pool = new Pool(dbProdConfig);
 }else{
+  console.log('Je suis en DEV');
   const dbDevConfig = {
     host: process.env.DB_DEV_HOST,
     port: process.env.DB_DEV_PORT,
