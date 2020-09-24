@@ -2,7 +2,7 @@ const express = require("express");
 const pretty = require('express-prettify');
 const cors = require('cors');
 const helmet = require("helmet");
-const { execQuery } = require('./db');
+const { execQuery, execQueryWithParams } = require('./db');
 
 const app = express();
 
@@ -11,7 +11,32 @@ app.use(pretty({ query: 'pretty' }));
 app.use(cors());
 
 app.get('/', async function (req, res) {
-  const query = `SELECT * from movies LIMIT 100`;
+
+  const limit = req.query.limit || null;
+  const date = req.query.date || null;
+
+  let query = `SELECT * from movies`;
+
+  if(date) {
+    query = `${query} WHERE`;
+
+    if(date) {
+      query = `${query} creation_date LIKE '%${date}%'`;
+    }
+  }
+
+  if(limit) {
+    query = `${query} LIMIT ${limit}`;
+  }else{
+    query = `${query} LIMIT 10`;
+  }
+
+  const response = await execQuery(query);
+  res.send(response.rows);
+});
+
+app.get('/movies/count', async function (req, res) {
+  let query = `SELECT count(*) from movies`;
   const response = await execQuery(query);
   res.send(response.rows);
 });

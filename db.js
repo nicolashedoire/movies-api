@@ -6,13 +6,13 @@ dotenv.config();
 let pool = null;
 
 if(process.env.PORT){
-  console.log('Je suis en PROD');
+  console.log('PRODUCTION MODE');
   const dbProdConfig = {
     connectionString: process.env.DATABASE_URL
   }
   pool = new Pool(dbProdConfig);
 }else{
-  console.log('Je suis en DEV');
+  console.log('DEVELOPEMENT MODE');
   const dbDevConfig = {
     host: process.env.DB_DEV_HOST,
     port: process.env.DB_DEV_PORT,
@@ -34,6 +34,17 @@ const execQuery = async (query) => {
   return pool.query(query);
 }
 
+const execQueryWithParams = async (query, values) => {
+  try{
+    const res = await pool.query(query, values);
+    return res.rows;
+  } catch(err) {
+    console.log(err.stack)
+    return 'error';
+  }
+}
+
 module.exports = {
-  execQuery
+  execQuery,
+  execQueryWithParams
 };
