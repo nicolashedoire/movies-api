@@ -38,7 +38,7 @@ app.get('/', async function (req, res) {
 app.get('/movies/count', async function (req, res) {
   let query = `SELECT count(*) from movies`;
   const response = await execQuery(query);
-  res.send(response.rows);
+  res.send(response.rows[0]);
 });
 
 app.listen(process.env.PORT || 5000, () => {
