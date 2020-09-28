@@ -12,13 +12,13 @@ app.use(cors());
 
 app.get('/', async function (req, res) {
   const limit = req.query.limit || null;
-  const date = req.query.date || null;
+  const year = req.query.year || null;
   const page = req.query.page || null;
   let query = `SELECT * from movies`;
-  if(date) {
+  if(year) {
     query = `${query} WHERE`;
-    if(date) {
-      query = `${query} creation_date LIKE '%${date}%'`;
+    if(year) {
+      query = `${query} creation_date LIKE '%${year}%'`;
     }
   }
 
