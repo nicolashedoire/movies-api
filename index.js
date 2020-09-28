@@ -11,24 +11,19 @@ app.use(pretty({ query: 'pretty' }));
 app.use(cors());
 
 app.get('/', async function (req, res) {
-
   const limit = req.query.limit || null;
   const date = req.query.date || null;
-
+  const page = req.query.page || null;
   let query = `SELECT * from movies`;
-
   if(date) {
     query = `${query} WHERE`;
-
     if(date) {
       query = `${query} creation_date LIKE '%${date}%'`;
     }
   }
 
   if(limit) {
-    query = `${query} LIMIT ${limit}`;
-  }else{
-    query = `${query} LIMIT 10`;
+    query = `${query} LIMIT ${limit} OFFSET ${page * limit}`;
   }
 
   const response = await execQuery(query);
