@@ -31,7 +31,8 @@ app.get('/', async function (req, res) {
 });
 
 app.get('/movies/count', async function (req, res) {
-  let query = `SELECT count(*) from movies`;
+  const year = req.query.year || null;
+  let query = `SELECT count(*) from movies WHERE creation_date LIKE '%${year}%'`;
   const response = await execQuery(query);
   res.send(response.rows[0]);
 });
