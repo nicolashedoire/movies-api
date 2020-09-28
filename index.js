@@ -23,7 +23,7 @@ app.get('/', async function (req, res) {
   }
 
   if(limit) {
-    query = `${query} LIMIT ${limit} OFFSET ${page * limit}`;
+    query = `${query} LIMIT ${limit} OFFSET ${page === 1 ? 0 : page * limit}`;
   }
 
   const response = await execQuery(query);
