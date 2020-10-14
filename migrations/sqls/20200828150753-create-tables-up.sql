@@ -13,3 +13,16 @@ CREATE TABLE IF NOT EXISTS movies (
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
   unique (title, creation_date)
 );
+
+
+CREATE TABLE IF NOT EXISTS historical (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  movie_id UUID REFERENCES movies(id),
+  user_uid TEXT,
+  seen_date DATE,
+  to_watch BOOLEAN DEFAULT false,
+  was_seen BOOLEAN DEFAULT false,
+  rating INT DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+  unique(movie_id, user_uid)
+);

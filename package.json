@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "start:dev": "nodemon index.js",
     "start": "node index.js",
     "migration": "./node_modules/.bin/db-migrate create ",
     "up": "./node_modules/.bin/db-migrate up -c 1",

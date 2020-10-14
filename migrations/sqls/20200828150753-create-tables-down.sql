@@ -1,3 +1,3 @@
+DROP TABLE IF EXISTS historical;
 DROP TABLE IF EXISTS movies;
-DROP TABLE IF EXISTS migrations;
 DROP EXTENSION IF EXISTS "uuid-ossp";

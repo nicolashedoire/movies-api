@@ -34,9 +34,9 @@ const execQuery = async (query) => {
   return pool.query(query);
 }
 
-const execQueryWithParams = async (query, values) => {
+const execQueryWithParams = async (query, params) => {
   try{
-    const res = await pool.query(query, values);
+    const res = await pool.query(query, [...params]);
     return res.rows;
   } catch(err) {
     console.log(err.stack)
