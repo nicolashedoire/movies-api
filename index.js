@@ -4,7 +4,6 @@ const cors = require('cors');
 const helmet = require("helmet");
 const { execQuery, execQueryWithParams } = require('./db');
 const bodyParser = require('body-parser');
-
 const app = express();
 
 app.use(helmet());
@@ -92,6 +91,14 @@ app.get('/historical', async function (req, res) {
   res.send(response.rows);
 });
 
+app.get('/historical/movie/:id', async function (req, res) {
+  const userId = req.query.uid || null;
+  const movieId = req.params.id || null;
+  let query = `SELECT * from historical WHERE user_uid=$1 AND movie_id=$2`;
+  const response = await execQueryWithParams(query, [userId, movieId]);
+  res.send(response.rows);
+})
+
 app.get('/historical/seen', async function (req, res) {
   const userId = req.query.uid || null;
   let query = `SELECT movies.title, movies.image, movies.id, historical.rating from movies join historical on movies.id = historical.movie_id WHERE historical.user_uid='${userId}' AND historical.was_seen=TRUE`;
@@ -110,6 +117,14 @@ app.put('/historical/towatch/unsubscribe', async function (req, res) {
   const userId = req.query.uid || null;
   const movieId = req.body.movieId || null;
   let query = `UPDATE historical SET to_watch=FALSE WHERE movie_id=$1 AND user_uid=$2`;
+  const response = await execQueryWithParams(query, [movieId, userId]);
+  res.send(response.rows);
+});
+
+app.put('/historical/seen/unsubscribe', async function (req, res) {
+  const userId = req.query.uid || null;
+  const movieId = req.body.movieId || null;
+  let query = `UPDATE historical SET was_seen=FALSE WHERE movie_id=$1 AND user_uid=$2`;
   const response = await execQueryWithParams(query, [movieId, userId]);
   res.send(response.rows);
 });
@@ -153,6 +168,25 @@ app.post('/historical', async function (req, res) {
   }
   const response = await execQueryWithParams(query, [movieId, userId]);
   res.send(response[0]);
+});
+
+app.put('/historical', async function (req, res) {
+  const userId = req.query.uid || null;
+  const movieId = req.body.movieId || null;
+  const action = req.body.action || null;
+  let query = null;
+
+  switch(action) {
+    case 'A' : 
+    query = `UPDATE historical SET was_seen=TRUE WHERE movie_id=$1 AND user_uid=$2 RETURNING *`;
+    break;
+    case 'B' : 
+    query = `UPDATE historical SET to_watch=TRUE WHERE movie_id=$1 AND user_uid=$2 RETURNING *`;
+    default : 
+      break;
+  }
+  const response = await execQueryWithParams(query, [movieId, userId]);
+  res.send(response.rows);
 });
 
 app.listen(process.env.PORT || 5000, () => {
