@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS movies (
 
 CREATE TABLE IF NOT EXISTS historical (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  movie_id UUID REFERENCES movies(id),
+  movie_id UUID REFERENCES movies(id) ON DELETE CASCADE,
   user_uid TEXT,
   seen_date DATE,
   to_watch BOOLEAN DEFAULT false,

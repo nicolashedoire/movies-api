@@ -13,11 +13,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(bodyParser.raw());
 
-app.get('/search', async function (req, res) {
-  const searchText = req.query.search || null;
-  let query = `SELECT title, image from movies WHERE title LIKE '%${searchText}%'`;
+app.post('/search', async function (req, res) {
+  const searchText = req.body.search || null;
+  let query = `SELECT title, image, id from movies WHERE to_tsvector(title) @@ to_tsquery('${searchText}') LIMIT 15`;
   const response = await execQuery(query);
-  res.send(response.rows[0]);
+  res.send(response.rows);
 });
 
 app.get('/movies', async function (req, res) {
@@ -63,7 +63,11 @@ app.get('/movies/:id', async function (req, res) {
   const movieId = req.params.id || null;
   let query = `SELECT * from movies WHERE id='${movieId}'`;
   const response = await execQuery(query);
-  res.send(response.rows[0]);
+  if(response.rowCount === 0){
+    res.status(404).send({ error: 'Not found!' });
+  }else {
+    res.send(response.rows[0]);
+  }
 });
 
 app.put('/movies/:id', async function (req, res) {
@@ -81,7 +85,11 @@ app.delete('/movies/:id', async function (req, res) {
   const movieId = req.params.id || null;
   let query = `DELETE FROM movies WHERE id = $1 RETURNING *`;
   const response = await execQueryWithParams(query, [movieId]);
-  res.send(response.rows);
+  if(response.name === 'error'){
+    res.status(500).send({ error: 'Something failed!' });
+  }else{
+    res.send(response.rows);
+  }
 });
 
 app.get('/historical', async function (req, res) {
@@ -101,7 +109,7 @@ app.get('/historical/movie/:id', async function (req, res) {
 
 app.get('/historical/seen', async function (req, res) {
   const userId = req.query.uid || null;
-  let query = `SELECT movies.title, movies.image, movies.id, historical.rating from movies join historical on movies.id = historical.movie_id WHERE historical.user_uid='${userId}' AND historical.was_seen=TRUE`;
+  let query = `SELECT movies.title, movies.image, movies.id, historical.rating from movies join historical on movies.id = historical.movie_id WHERE historical.user_uid='${userId}' AND historical.was_seen=TRUE ORDER BY title`;
   const response = await execQuery(query);
   res.send(response.rows);
 });
@@ -187,6 +195,18 @@ app.put('/historical', async function (req, res) {
   }
   const response = await execQueryWithParams(query, [movieId, userId]);
   res.send(response.rows);
+});
+
+app.get('/statistics', async function (req, res) {
+  const userId = req.query.uid || null;
+  let query = `select rating, array_length(array_agg(rating), 1) as count
+  from historical
+  WHERE was_seen=TRUE
+  AND user_uid=$1
+  GROUP BY rating
+  ORDER BY rating;`;
+  const response = await execQueryWithParams(query, [userId]);
+  res.send(response);
 });
 
 app.listen(process.env.PORT || 5000, () => {
