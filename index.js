@@ -1,3 +1,6 @@
+const cheerio = require("cheerio");
+const axios = require("axios");
+
 const express = require("express");
 const pretty = require('express-prettify');
 const cors = require('cors');
@@ -88,7 +91,6 @@ app.put('/movies/:id', async function (req, res) {
   const synopsis = req.body.synopsis;
   const title = req.body.title;
   const allocineId = req.body.allocineId;
-  console.log(image)
   let query = `UPDATE movies SET allocine_id=$1, title=$2, image=$3, synopsis=$4 WHERE id=$5`;
   const response = await execQueryWithParams(query, [allocineId, title, image, synopsis, movieId]);
   res.send(response.rows);
@@ -222,6 +224,62 @@ app.get('/statistics', async function (req, res) {
   const response = await execQueryWithParams(query, [userId]);
   res.send(response);
 });
+
+
+app.get('/scrapping', function (req, res) {
+
+  if(!req.query.page){
+    res.send('Vous devez indiquer le paramètre page dans l\' url'); 
+    return;
+  }
+
+  let counter = req.query.page;
+  const url = `http://www.allocine.fr/film/fichefilm_gen_cfilm=${counter}.html`;
+  
+  axios.get(url).then((result) => {
+    const $ = cheerio.load(result.data);
+    const title = $(".titlebar-page > .titlebar-title").text().trim();
+    const synopsis = $(".ovw-synopsis > .content-txt").text().trim();
+    const date = $(".meta-body-info > .date").text().trim();
+    const director = $(".meta-body-direction > .blue-link").text().trim();
+    const gender = $(".meta-body > .meta-body-info > span").text().split("//");
+    const image = $(
+      ".entity-card-overview > .thumbnail > .thumbnail-container > .thumbnail-img"
+    ).attr("src");
+    const genders = gender[1] ? gender[1].split(/(?=[A-Z])/) : [];
+    let duration = "";
+    const timeResult = $(".meta-body > .meta-body-info").text().split("/");
+    for (let i = 0; i < timeResult.length; i++) {
+      if (timeResult[i].includes("min")) {
+        duration = timeResult[i].trim();
+      }
+    }
+    res.header("Content-Type",'application/json');
+    const movie = {
+      genders,
+      title,
+      synopsis,
+      date,
+      image,
+      director,
+      duration
+    }
+    // const dataInserted = postMovie(movie);
+    res.json({
+      genders,
+      title,
+      synopsis,
+      date,
+      image,
+      director,
+      duration,
+    });
+  }).catch(err => {
+    console.log(err);
+  })
+});
+
+
 
 app.listen(process.env.PORT || 5000, () => {
   console.log(`API Movies listen on port ${process.env.PORT ? process.env.PORT : '5000'}`);
