@@ -15,7 +15,8 @@ app.use(bodyParser.raw());
 
 app.post('/search', async function (req, res) {
   const searchText = req.body.search || null;
-  let query = `SELECT title, image, id from movies WHERE to_tsvector(title) @@ to_tsquery('${searchText}') LIMIT 15`;
+  // let query = `SELECT title, image, id from movies WHERE to_tsvector(title) @@ to_tsquery('${searchText}') LIMIT 15`;
+  let query = `SELECT * from movies where title ILIKE '%${searchText}%' LIMIT 20`;
   const response = await execQuery(query);
   res.send(response.rows);
 });
@@ -60,9 +61,7 @@ app.post('/movies', async function (req, res) {
 });
 
 app.get('/movies/monthly', async function (req, res) {
-  console.log('je suis dans la bonne fonction')
   const currentYear = new Date().getFullYear();
-  console.log(currentYear)
   let query = `SELECT * from movies where creation_date LIKE '%octobre ${currentYear}%';`;
   const response = await execQuery(query);
   if(response.rowCount === 0){
