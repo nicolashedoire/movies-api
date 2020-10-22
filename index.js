@@ -59,6 +59,19 @@ app.post('/movies', async function (req, res) {
   res.send(response.rows);
 });
 
+app.get('/movies/monthly', async function (req, res) {
+  console.log('je suis dans la bonne fonction')
+  const currentYear = new Date().getFullYear();
+  console.log(currentYear)
+  let query = `SELECT * from movies where creation_date LIKE '%octobre ${currentYear}%';`;
+  const response = await execQuery(query);
+  if(response.rowCount === 0){
+    res.status(404).send({ error: 'Not found!' });
+  }else {
+    res.send(response.rows);
+  }
+});
+
 app.get('/movies/:id', async function (req, res) {
   const movieId = req.params.id || null;
   let query = `SELECT * from movies WHERE id='${movieId}'`;
@@ -76,7 +89,8 @@ app.put('/movies/:id', async function (req, res) {
   const synopsis = req.body.synopsis;
   const title = req.body.title;
   const allocineId = req.body.allocineId;
-  let query = `UPDATE movies SET allocine_id= $1 title= $2, image= $3, synopsis= $4 WHERE id= $5`;
+  console.log(image)
+  let query = `UPDATE movies SET allocine_id=$1, title=$2, image=$3, synopsis=$4 WHERE id=$5`;
   const response = await execQueryWithParams(query, [allocineId, title, image, synopsis, movieId]);
   res.send(response.rows);
 });
@@ -91,6 +105,7 @@ app.delete('/movies/:id', async function (req, res) {
     res.send(response.rows);
   }
 });
+
 
 app.get('/historical', async function (req, res) {
   const userId = req.query.uid || null;
@@ -116,7 +131,7 @@ app.get('/historical/seen', async function (req, res) {
 
 app.get('/historical/towatch', async function (req, res) {
   const userId = req.query.uid || null;
-  let query = `SELECT movies.title, movies.image, movies.id from movies join historical on movies.id = historical.movie_id WHERE historical.user_uid='${userId}' AND historical.to_watch=TRUE`;
+  let query = `SELECT movies.title, movies.image, movies.id from movies join historical on movies.id = historical.movie_id WHERE historical.user_uid='${userId}' AND historical.to_watch=TRUE ORDER BY title`;
   const response = await execQuery(query);
   res.send(response.rows);
 });
