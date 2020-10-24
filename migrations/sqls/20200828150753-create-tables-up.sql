@@ -32,5 +32,5 @@ CREATE TABLE IF NOT EXISTS movies_on_platforms (
   movie_id UUID REFERENCES movies(id) ON DELETE CASCADE,
   platforms JSON,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
-  unique(movie_id);
+  unique(movie_id)
 );
