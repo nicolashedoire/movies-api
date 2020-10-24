@@ -17,9 +17,15 @@ app.use(bodyParser.json());
 app.use(bodyParser.raw());
 
 app.post('/search', async function (req, res) {
+  const type = req.query.type || null;
   const searchText = req.body.search || null;
+  let query = null;
   // let query = `SELECT title, image, id from movies WHERE to_tsvector(title) @@ to_tsquery('${searchText}') LIMIT 15`;
-  let query = `SELECT * from movies where title ILIKE '%${searchText}%' LIMIT 20`;
+  if(type === 'title'){
+    query = `SELECT * from movies where title ILIKE '%${searchText}%' LIMIT 20`;
+  }else {
+    query = `SELECT * from movies where allocine_id ILIKE '%${searchText}%' LIMIT 20`;
+  }
   const response = await execQuery(query);
   res.send(response.rows);
 });

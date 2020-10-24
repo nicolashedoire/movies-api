@@ -26,3 +26,11 @@ CREATE TABLE IF NOT EXISTS historical (
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
   unique(movie_id, user_uid)
 );
+
+CREATE TABLE IF NOT EXISTS movies_on_platforms (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  movie_id UUID REFERENCES movies(id) ON DELETE CASCADE,
+  platforms JSON,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+  unique(movie_id);
+);

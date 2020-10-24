@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS movies_on_platforms;
 DROP TABLE IF EXISTS historical;
 DROP TABLE IF EXISTS movies;
 DROP EXTENSION IF EXISTS "uuid-ossp";
