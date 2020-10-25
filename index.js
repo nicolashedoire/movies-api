@@ -127,6 +127,23 @@ app.put('/movies/:id/platforms', async function (req, res) {
   }
 });
 
+app.delete('/movies/:id/platforms/:platform', async function (req, res) {
+  const movieId = req.params.id || null;
+  const platform = req.params.platform || null;
+  let query = `SELECT * from movies_on_platforms WHERE movie_id='${movieId}'`;
+  const response = await execQuery(query);
+  if(response.rowCount === 1){
+    let platforms = response.rows[0].platforms;
+    console.log(platforms);
+    platforms[platform] = {
+      active: false
+    }
+    query = `UPDATE movies_on_platforms SET platforms=$1 WHERE movie_id=$2 RETURNING *`;
+    const responseUpdated = await execQueryWithParams(query, [JSON.stringify(platforms), movieId]);
+    res.send(responseUpdated[0]);
+  }
+});
+
 app.put('/movies/:id', async function (req, res) {
   const movieId = req.params.id || null;
   const image = req.body.image;
