@@ -64,8 +64,9 @@ app.post('/movies', async function (req, res) {
   const duration = req.body.duration;
   const director = req.body.director;
   const creation_date = req.body.creation_date;
-  let query = `INSERT INTO movies (title, synopsis, image ,duration, director, creation_date) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`;
-  const response = await execQueryWithParams(query, [title, synopsis, image, duration, director, creation_date]);
+  const allocine_id = req.body.allocine_id || null;
+  let query = `INSERT INTO movies (title, synopsis, image ,duration, director, creation_date, allocine_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
+  const response = await execQueryWithParams(query, [title, synopsis, image, duration, director, creation_date, allocine_id]);
   res.send(response.rows);
 });
 
@@ -91,6 +92,41 @@ app.get('/movies/:id', async function (req, res) {
   }
 });
 
+app.get('/movies/:id/platforms', async function (req, res) {
+  const movieId = req.params.id || null;
+  let query = `SELECT * from movies_on_platforms WHERE movie_id='${movieId}'`;
+  const response = await execQuery(query);
+  if(response.rowCount === 0){
+    res.status(404).send({ error: 'Not found!' });
+  }else {
+    res.send(response.rows[0]);
+  }
+});
+
+app.put('/movies/:id/platforms', async function (req, res) {
+  const movieId = req.params.id || null;
+  const platform = req.body.platform;
+  let query = `SELECT * from movies_on_platforms WHERE movie_id='${movieId}'`;
+  const response = await execQuery(query);
+  if(response.rowCount === 0){
+    let platforms = {};
+    platforms[platform] = {
+      active : true
+    };
+    query = `INSERT INTO movies_on_platforms (movie_id, platforms) VALUES ($1, $2) RETURNING *`;
+    const responseInserted = await execQueryWithParams(query, [movieId, JSON.stringify(platforms)]);
+    res.send(responseInserted[0]);
+  }else {
+    let platforms = response.rows[0].platforms;
+    platforms[platform] = {
+      active: true
+    };
+    query = `UPDATE movies_on_platforms SET platforms=$1 WHERE movie_id=$2 RETURNING *`;
+    const responseUpdated = await execQueryWithParams(query, [JSON.stringify(platforms), movieId]);
+    res.send(responseUpdated[0]);
+  }
+});
+
 app.put('/movies/:id', async function (req, res) {
   const movieId = req.params.id || null;
   const image = req.body.image;
@@ -112,7 +148,6 @@ app.delete('/movies/:id', async function (req, res) {
     res.send(response.rows);
   }
 });
-
 
 app.get('/historical', async function (req, res) {
   const userId = req.query.uid || null;
